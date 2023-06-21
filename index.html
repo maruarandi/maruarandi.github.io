@@ -1,9 +1,217 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Hello World</title>
+    <style>
+        #network {
+            width: 800px;
+            height: 600px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vis-network@9.0.1/dist/vis-network.min.css" />
 </head>
 <body>
-    <h1>Hello, World!!</h1>
+    <div id="network"></div>
+    <button id="play-button">Play</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/vis-network@9.0.1/dist/vis-network.min.js"></script>
+    <script>
+        // Create an array of nodes for each time step
+        var nodes = {
+            1: [
+                { id: 1, label: "UNIVERSIDAD NACIONAL AUTONOMA DE TAYACAJA DANIEL HERNANDEZ MORILLO"},
+                { id: 2, label: "FELIX TELLO BIANCA MALU" }
+            ],
+
+            2: [
+                { id: 1, label: "UNIVERSIDAD NACIONAL AUTONOMA DE TAYACAJA DANIEL HERNANDEZ MORILLO"},
+                { id: 2, label: "VIETTEL  PERU  S.A.C." }
+            ],
+            3: [
+                { id: 1, label: "UNIVERSIDAD NACIONAL AUTONOMA DE TAYACAJA DANIEL HERNANDEZ MORILLO" },
+                { id: 2, label: "RCP LABORATORIOS E.I.R.L." },
+                { id: 3, label: "H.W.KESSEL S.A.C." },
+                { id: 4, label: "NUCLEOTECH EQUIPAMIENTO CIENTIFICO S.A.C." },
+                { id: 5, label: "MOTORES DIESEL ANDINOS S.A.- MODASA" },
+                { id: 6, label: "GEODESIA Y TOPOGRAFIA S.A.C." }
+            ]
+        };
+
+        // Create an array of edges for each time step
+        var edges = {
+            1: [
+                { from: 1, to: 2 }
+            ],
+            2: [
+                { from: 1, to: 2 }
+            ],
+            3: [
+                { from: 1, to: 2 },
+                { from: 1, to: 3 },
+                { from: 1, to: 4 },
+                { from: 1, to: 5 },
+                { from: 1, to: 6 }
+            ]
+        };
+
+        // Create options for the network graph
+        var options = {
+            physics: {
+                enabled: true,
+                barnesHut: {
+                    gravitationalConstant: -2000,
+                    centralGravity: 0.1,
+                    springLength: 200,
+                    springConstant: 0.05,
+                    damping: 0.09,
+                    avoidOverlap: 1
+                },
+                stabilization: {
+                    enabled: true,
+                    iterations: 1000,
+                    fit: true
+                },
+                minVelocity: 0.75,
+                maxVelocity: 100,
+                solver: "barnesHut",
+                barnesHut: {
+                    gravitationalConstant: -2000,
+                    springConstant: 0.04,
+                    springLength: 95
+                },
+                timestep: 0.3
+            }
+        };
+// Create a new network instance
+var container = document.getElementById("network");
+var network = new vis.Network(container, {}, options);
+
+// Get the play button element
+var playButton = document.getElementById("play-button");
+
+// Get the text indicator element
+var indicator = document.createElement("div");
+indicator.id = "indicator";
+document.body.appendChild(indicator);
+
+// Get the slicer element
+var slicer = document.createElement("input");
+slicer.type = "range";
+slicer.min = 1;
+slicer.max = Object.keys(nodes).length;
+slicer.value = 1;
+document.body.appendChild(slicer);
+
+// Variable to store the current time step
+var currentTimeStep = parseInt(slicer.value);
+
+// Variable to track if automatic update is running
+var isAutomaticUpdateRunning = false;
+
+// Function to update the network with the current time step data
+function updateNetwork() {
+    // Get the nodes and edges for the current time step
+    var currentNodes = nodes[currentTimeStep];
+    var currentEdges = edges[currentTimeStep];
+
+    // Create a data object with the current nodes and edges
+    var data = {
+        nodes: new vis.DataSet(currentNodes),
+        edges: new vis.DataSet(currentEdges)
+    };
+
+    // Update the network data
+    network.setData(data);
+
+    // Update the text indicator
+    var indicators = ["abril 2020", "mayo 2020", "junio 2020"];
+    indicator.textContent = indicators[currentTimeStep - 1];
+
+    // Update the slicer value
+    slicer.value = currentTimeStep;
+}
+
+// Function to advance to the next time step
+function nextTimeStep() {
+    currentTimeStep++;
+
+    // If the current time step exceeds the maximum, stop the automatic update
+    if (currentTimeStep > Object.keys(nodes).length) {
+        stopAutomaticUpdate();
+        return;
+    }
+
+    // Update the network with the new time step data
+    updateNetwork();
+}
+
+// Function to start the automatic update
+function startAutomaticUpdate() {
+    if (isAutomaticUpdateRunning) {
+        return;
+    }
+
+    // Reset the current time step to 1
+    currentTimeStep = 1;
+
+    // Update the network with the initial time step data
+    updateNetwork();
+
+    // Recursive function to update the network with a time delay between steps
+    function updateWithDelay() {
+        // Call nextTimeStep to update the network
+        nextTimeStep();
+
+        // If the automatic update is not running, stop the recursion
+        if (!isAutomaticUpdateRunning) {
+            return;
+        }
+
+        // Set a time delay of 3 seconds (3000 milliseconds)
+        setTimeout(updateWithDelay, 3000);
+    }
+
+    // Set the flag to indicate that automatic update is running
+    isAutomaticUpdateRunning = true;
+
+    // Start the automatic update
+    updateWithDelay();
+}
+
+// Function to stop the automatic update
+function stopAutomaticUpdate() {
+    isAutomaticUpdateRunning = false;
+}
+
+// Function to handle the play button click event
+function onPlayButtonClick() {
+    if (isAutomaticUpdateRunning) {
+        stopAutomaticUpdate();
+    } else {
+        startAutomaticUpdate();
+    }
+}
+
+// Function to handle the slicer change event
+function onSlicerChange() {
+    // Update the current time step
+    currentTimeStep = parseInt(slicer.value);
+
+    // Update the network with the new time step data
+    updateNetwork();
+}
+
+// Add click event listener to the play button
+playButton.addEventListener("click", onPlayButtonClick);
+
+// Add change event listener to the slicer
+slicer.addEventListener("change", onSlicerChange);
+
+// Initialize the network with the initial time step data
+updateNetwork();
+
+
+
+    </script>
 </body>
 </html>
+
