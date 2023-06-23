@@ -3,8 +3,9 @@
 <head>
     <style>
         #network {
-            width: 800px;
+            width: 100%;
             height: 600px;
+            background-color: #FAFAFA;
         }
     </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vis-network@9.0.1/dist/vis-network.min.css" />
@@ -18,43 +19,61 @@
         // Create an array of nodes for each time step
         var nodes = {
             1: [
-                { id: 1, label: "UNIVERSIDAD NACIONAL AUTONOMA DE TAYACAJA DANIEL HERNANDEZ MORILLO"},
-                { id: 2, label: "FELIX TELLO BIANCA MALU" }
+                { id: 1, label: "UNIVERSIDAD NACIONAL AUTONOMA DE TAYACAJA DANIEL HERNANDEZ MORILLO", color : "#588c7e"},
+                { id: 2, label: "FELIX TELLO BIANCA MALU", color : "#f2e394"}
             ],
 
             2: [
-                { id: 1, label: "UNIVERSIDAD NACIONAL AUTONOMA DE TAYACAJA DANIEL HERNANDEZ MORILLO"},
-                { id: 2, label: "VIETTEL  PERU  S.A.C." }
+                { id: 1, label: "UNIVERSIDAD NACIONAL AUTONOMA DE TAYACAJA DANIEL HERNANDEZ MORILLO", color : "#588c7e"},
+                { id: 2, label: "VIETTEL  PERU  S.A.C." , color : "#f2e394"}
             ],
             3: [
-                { id: 1, label: "UNIVERSIDAD NACIONAL AUTONOMA DE TAYACAJA DANIEL HERNANDEZ MORILLO" },
-                { id: 2, label: "RCP LABORATORIOS E.I.R.L." },
-                { id: 3, label: "H.W.KESSEL S.A.C." },
-                { id: 4, label: "NUCLEOTECH EQUIPAMIENTO CIENTIFICO S.A.C." },
-                { id: 5, label: "MOTORES DIESEL ANDINOS S.A.- MODASA" },
-                { id: 6, label: "GEODESIA Y TOPOGRAFIA S.A.C." }
+                { id: 1, label: "UNIVERSIDAD NACIONAL AUTONOMA DE TAYACAJA DANIEL HERNANDEZ MORILLO", color : "#588c7e" },
+                { id: 2, label: "RCP LABORATORIOS E.I.R.L.", color : "#f2e394" },
+                { id: 3, label: "H.W.KESSEL S.A.C.", color : "#f2e394" },
+                { id: 4, label: "NUCLEOTECH EQUIPAMIENTO CIENTIFICO S.A.C.", color : "#f2e394" },
+                { id: 5, label: "MOTORES DIESEL ANDINOS S.A.- MODASA" , color : "#f2e394"},
+                { id: 6, label: "GEODESIA Y TOPOGRAFIA S.A.C.", color : "#f2e394" }
             ]
         };
 
         // Create an array of edges for each time step
         var edges = {
             1: [
-                { from: 1, to: 2 }
+                { from: 1, to: 2 , label : 'No_Covid', color: { color: '#A0A0A0' }}
             ],
             2: [
-                { from: 1, to: 2 }
+                { from: 1, to: 2 , label : 'No_Covid',color: { color: '#A0A0A0' }}
             ],
             3: [
-                { from: 1, to: 2 },
-                { from: 1, to: 3 },
-                { from: 1, to: 4 },
-                { from: 1, to: 5 },
-                { from: 1, to: 6 }
+                { from: 1, to: 2 , label : 'No_Covid',color: { color: '#A0A0A0' }},
+                { from: 1, to: 3 , label : 'No_Covid',color: { color: '#A0A0A0' }},
+                { from: 1, to: 4 , label : 'No_Covid',color: { color: '#A0A0A0' }},
+                { from: 1, to: 5 , label : 'Covid',color: { color: '#A0A0A0' }},
+                { from: 1, to: 6 , label : 'Covid',color: { color: '#A0A0A0' }}
             ]
         };
 
         // Create options for the network graph
+        // Create options for the network graph
         var options = {
+            nodes: {
+                size: 10,
+                margin: 10,
+                widthConstraint: {
+                    maximum: 200,
+                },
+                shape: "dot",
+                shapeProperties: {
+                    interpolation: false
+                },
+                font: {
+                    size: 10
+                }
+            },
+            edges:{ font: {
+                    size: 8
+                }},
             physics: {
                 enabled: true,
                 barnesHut: {
@@ -81,6 +100,7 @@
                 timestep: 0.3
             }
         };
+
 // Create a new network instance
 var container = document.getElementById("network");
 var network = new vis.Network(container, {}, options);
@@ -123,7 +143,7 @@ function updateNetwork() {
     network.setData(data);
 
     // Update the text indicator
-    var indicators = ["abril 2020", "mayo 2020", "junio 2020"];
+    var indicators = ["Abril 2020", "Mayo 2020", "Junio 2020"];
     indicator.textContent = indicators[currentTimeStep - 1];
 
     // Update the slicer value
@@ -209,9 +229,8 @@ slicer.addEventListener("change", onSlicerChange);
 // Initialize the network with the initial time step data
 updateNetwork();
 
-
-
     </script>
 </body>
 </html>
+
 
